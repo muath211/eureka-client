@@ -6,6 +6,8 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,14 +16,36 @@ import java.util.stream.Collectors;
 public class ClientController {
 
     @Autowired
-    DiscoveryClient discoveryClient;
+    private DiscoveryClient discoveryClient;
 
-    @GetMapping("hi")
-    public String sayHi(){
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @GetMapping("/hi")
+    @ResponseBody
+    public String sayHi() {
 
         List<ServiceInstance> instances = discoveryClient.getInstances("eureka-client-two");
         String collect = instances.stream().map(i -> i.getUri().toString()).collect(Collectors.joining());
-        return collect;
+
+        String services = discoveryClient.getServices().stream().collect(Collectors.joining());
+
+
+        return collect + "\n services: \n" + services;
+    }
+
+    @GetMapping("/load/hello")
+    public @ResponseBody
+    String sayLoadBalancedHello() {
+        ServiceInstance instance = discoveryClient.getInstances("eureka-client-two").get(0);
+        String forObject = restTemplate.getForObject(instance.getUri().toString() + "/hello", String.class);
+        return forObject;
+    }
+
+    @GetMapping("/hello")
+    public @ResponseBody
+    String sayHello() {
+        return "hello world";
     }
 
 }
