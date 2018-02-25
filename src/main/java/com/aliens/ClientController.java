@@ -37,8 +37,8 @@ public class ClientController {
     @GetMapping("/load/hello")
     public @ResponseBody
     String sayLoadBalancedHello() {
-        ServiceInstance instance = discoveryClient.getInstances("eureka-client-two").get(0);
-        String forObject = restTemplate.getForObject(instance.getUri().toString() + "/hello", String.class);
+
+        String forObject = restTemplate.getForObject("http://TEST/hello", String.class);
         return forObject;
     }
 
