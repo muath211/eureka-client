@@ -1,4 +1,4 @@
 ---
 spring:
   application:
-    name: eureka-client-two
+    name: eureka-client
